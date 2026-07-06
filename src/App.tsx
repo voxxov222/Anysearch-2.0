@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react";
 import { SearchInput } from "./components/SearchInput";
 import { SearchResultItem } from "./components/SearchResultItem";
 import { AiSummary } from "./components/AiSummary";
+import { NodeGraph } from "./components/NodeGraph";
 import { SearchResult, SearchMetadata } from "./types";
 import { cn } from "./lib/utils";
-import { Key, X } from "lucide-react";
+import { Key, X, List, Network } from "lucide-react";
 
 export default function App() {
   const [query, setQuery] = useState("");
@@ -23,6 +24,7 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   
   const [hasSearched, setHasSearched] = useState(false);
+  const [viewMode, setViewMode] = useState<"list" | "graph">("list");
 
   useEffect(() => {
     const storedKey = localStorage.getItem("anysearch_api_key");
@@ -228,19 +230,53 @@ export default function App() {
                 {/* Main Results Column */}
                 {results.length > 0 && (
                   <div className="flex-1 min-w-0">
-                    {metadata && (
-                      <div className="text-[10px] font-mono text-zinc-500 mb-6 flex items-center gap-2 uppercase tracking-widest">
-                        <span>Found {metadata.total_results} results</span>
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                        <span>{metadata.search_time_ms}ms</span>
+                    <div className="flex items-center justify-between mb-6">
+                      {metadata && (
+                        <div className="text-[10px] font-mono text-zinc-500 flex items-center gap-2 uppercase tracking-widest">
+                          <span>Found {metadata.total_results} results</span>
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                          <span>{metadata.search_time_ms}ms</span>
+                        </div>
+                      )}
+                      
+                      {/* View Toggle */}
+                      <div className="flex items-center bg-zinc-100 dark:bg-zinc-800 rounded-lg p-1">
+                        <button
+                          onClick={() => setViewMode("list")}
+                          className={cn(
+                            "p-1.5 rounded-md flex items-center gap-2 text-xs font-medium transition-colors",
+                            viewMode === "list" 
+                              ? "bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-sm" 
+                              : "text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
+                          )}
+                        >
+                          <List className="w-4 h-4" />
+                          List
+                        </button>
+                        <button
+                          onClick={() => setViewMode("graph")}
+                          className={cn(
+                            "p-1.5 rounded-md flex items-center gap-2 text-xs font-medium transition-colors",
+                            viewMode === "graph" 
+                              ? "bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-sm" 
+                              : "text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
+                          )}
+                        >
+                          <Network className="w-4 h-4" />
+                          Graph
+                        </button>
                       </div>
-                    )}
-
-                    <div className="space-y-2">
-                      {results.map((result, idx) => (
-                        <SearchResultItem key={idx} result={result} />
-                      ))}
                     </div>
+
+                    {viewMode === "list" ? (
+                      <div className="space-y-2">
+                        {results.map((result, idx) => (
+                          <SearchResultItem key={idx} result={result} />
+                        ))}
+                      </div>
+                    ) : (
+                      <NodeGraph query={query} results={results} />
+                    )}
                   </div>
                 )}
 
