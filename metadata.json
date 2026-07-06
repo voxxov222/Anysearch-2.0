@@ -1,0 +1,6 @@
+{
+  "name": "AnySearch UI",
+  "description": "An unrestricted AI-powered search engine using AnySearch API and Gemini for rapid summarization.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
